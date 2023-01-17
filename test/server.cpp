@@ -4,22 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <thread>
+#include <pthread.h>
 #include <iostream>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <functional>
-#include <typeinfo>
 #define PORT 65010
 
-void worker(int & new_socket)
+int counter = 0;
+
+void *worker(void* new_socket)
 {
+    int socket = *(int*)new_socket;
     char buffer[1024] = { 0 };
     const char* hello = "Hello from server";
-    while (read(new_socket, buffer, 1024)) {
+    while (read(socket, buffer, 1024)) {
+        counter++;
         printf("%s\n", buffer);
-        send(new_socket, hello, strlen(hello), 0);
+        send(socket, hello, strlen(hello), 0);
         printf("Hello message sent\n");
+        printf("%d\n", counter);
     }
 }
 
@@ -58,8 +62,9 @@ int main(int argc, char const* argv[])
     }
     if ((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) > 0) {
         printf("Left main thread\n");
-        std::thread workerthread(worker, std::ref(new_socket));
-        workerthread.detach();
+        pthread_t workerthread;
+        int ret = pthread_create(&workerthread, NULL, worker, &new_socket);
+        pthread_join(workerthread, NULL);
     }
 
     // close(new_socket);

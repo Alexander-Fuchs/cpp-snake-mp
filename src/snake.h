@@ -22,7 +22,7 @@ public:
     [[nodiscard]] int GetScore() const;
     [[nodiscard]] int GetSize() const;
 
-    Direction direction = Direction::kUp;
+    Direction direction = Direction::kDown;
 
     float speed{0.1f};
     int size{1};

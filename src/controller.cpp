@@ -6,6 +6,9 @@
 
 void Controller::ChangeDirection(Snake &snake, Snake::Direction input,
                                  Snake::Direction opposite, int &socket) const {
+    if (snake.direction == input) {
+        return;
+    }
     if (snake.direction != opposite || snake.size == 1) {
         snake.direction = input;
         std::string message = "d" + std::to_string((int)snake.direction);

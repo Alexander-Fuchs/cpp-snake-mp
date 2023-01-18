@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <functional>
 #include <unistd.h>
@@ -16,7 +17,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
           engine(dev()),
           random_w(0, static_cast<int>(grid_width - 1)),
           random_h(0, static_cast<int>(grid_height - 1)) {
-    PlaceFood();
+    PlaceFood(30, 30);
 }
 
 void Game::SetupSocket(const std::string& server_ip) {
@@ -30,6 +31,10 @@ void Game::SetupSocket(const std::string& server_ip) {
     int addrlen = sizeof(address);
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+    if (setsockopt(server_fd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt))) {
+        perror("setsockopt");
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
@@ -74,26 +79,48 @@ void *Game::SocketHandler(void *game_ptr)
     printf("SocketHandler\n");
     Game * game = (Game*)game_ptr;
     int socket = game->_socket;
-    char buffer[256] = { 0 };
-    while (read(socket, buffer, 256)) {
-        printf("%s\n", buffer);
-        if (buffer[0] == 's') {
+    char buffer[64] = { 0 };
+    while (read(socket, buffer, 64)) {
+        std::string strBuffer = buffer;
+        // printf("%s\n", buffer);
+        if (strBuffer.substr(0, 1) == "s") {
             if (game->isHost) {
-                game->snake2.HasEaten(game->food, true);
+                bool eaten = game->snake2.HasEaten(game->food, true);
+                game->PlaceFood();
+                std::string message = "f" + std::to_string(game->food.x) + "," + std::to_string(game->food.y);
+                send(socket, static_cast<void*>(&message), message.size(), 0);
             } else {
-                game->snake.HasEaten(game->food, true);
+                bool eaten = game->snake.HasEaten(game->food, true);
             }
-        } else if (buffer[0] == 'd') {
-            int direction = strtol(buffer + 1, NULL, 10);
+            strBuffer.erase(0, 1);
+        }
+        if (strBuffer.substr(0, 1) == "d") {
+            int direction = stoi(strBuffer.substr(1, 1));
             auto new_direction = static_cast<Snake::Direction>(direction);
             if (game->isHost) {
                 game->snake2.direction = new_direction;
             } else {
                 game->snake.direction = new_direction;
             }
-        } else if (buffer[0] == 'q') {
-            // TODO Quit
+            strBuffer.erase(0, 2);
         }
+        if (strBuffer.substr(0, 1) == "f") {
+            if (!game->isHost) {
+                strBuffer.erase(0, 1);
+                std::string token;
+                unsigned long delPos = strBuffer.find(',');
+                token = strBuffer.substr(0, delPos);
+                int x = strtol(token.c_str(), NULL, 10);
+                strBuffer.erase(0, delPos + 1);
+                int y = strtol(strBuffer.c_str(), NULL, 10);
+                game->food.x = x;
+                game->food.y = y;
+            }
+        }
+        if (strBuffer.substr(0, 1) == "q") {
+            // TODO: Quit game
+        }
+        memset(buffer, '\0', sizeof(buffer));
     }
 }
 
@@ -109,8 +136,6 @@ void Game::Run(Controller const &controller, Renderer &renderer,
         printf("Connecting to server... %s\n", server_ip.c_str());
         SetupSocket(server_ip);
     }
-
-    // TODO: Sync food placement!
 
     Uint32 title_timestamp = SDL_GetTicks();
     Uint32 frame_start;
@@ -159,16 +184,21 @@ std::array<Snake, 2> Game::GetSnakes() const {
     return snake_array;
 }
 
-void Game::PlaceFood() {
+void Game::PlaceFood(int forceX, int forceY) {
     int x, y;
-    while (true) {
-        x = random_w(engine);
-        y = random_h(engine);
-        // Check that the location is not occupied by a snake item before placing food.
-        if (!snake.SnakeCell(x, y) && !snake2.SnakeCell(x, y)) {
-            food.x = x;
-            food.y = y;
-            return;
+    if (forceX >= 0 && forceY >= 0) {
+        food.x = forceX;
+        food.y = forceY;
+    } else {
+        while (true) {
+            x = random_w(engine);
+            y = random_h(engine);
+            // Check that the location is not occupied by a snake item before placing food.
+            if (!snake.SnakeCell(x, y) && !snake2.SnakeCell(x, y)) {
+                food.x = x;
+                food.y = y;
+                return;
+            }
         }
     }
 }
@@ -179,16 +209,15 @@ void Game::Update() {
     if (isHost) {
         bool snake1Eaten = snake.HasEaten(food);
         if (snake1Eaten) {
-            std::string message = "s" + std::to_string(snake.GetScore());
-            send(_socket, static_cast<void*>(&message), message.size(), 0);
+            send(_socket, "s", 1, 0);
             PlaceFood();
-            // TODO: Send to client new food position
+            std::string message = "f" + std::to_string(food.x) + "," + std::to_string(food.y);
+            send(_socket, static_cast<void*>(&message), message.size(), 0);
         }
     } else {
         bool snake2Eaten = snake2.HasEaten(food);
         if (snake2Eaten) {
-            std::string message = "s" + std::to_string(snake.GetScore());
-            send(_socket, static_cast<void*>(&message), message.size(), 0);
+            send(_socket, "s", 1, 0);
         }
     }
 }

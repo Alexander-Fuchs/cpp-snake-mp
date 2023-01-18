@@ -6,12 +6,10 @@ Snake::Snake(int grid_width, int grid_height, bool is_client_player)
         : grid_width(grid_width),
           grid_height(grid_height),
           is_client_player(is_client_player) {
+    head_x = static_cast<int>(grid_width / 2);
     head_y = static_cast<int>(grid_height / 2);
     if (is_client_player) {
-        head_x = static_cast<int>(grid_width / 2) - 1;
         direction = Direction::kUp;
-    } else {
-        head_x = static_cast<int>(grid_width / 2);
     }
 }
 

@@ -13,12 +13,11 @@ public:
     Snake(int grid_width, int grid_height, bool is_client_player = false);
 
     void Update();
-
     void GrowBody();
+    void SetScore(int newScore);
 
     bool SnakeCell(int x, int y);
-
-    bool HasEaten(SDL_Point &food);
+    bool HasEaten(SDL_Point &food, bool force = false);
 
     [[nodiscard]] int GetScore() const;
     [[nodiscard]] int GetSize() const;

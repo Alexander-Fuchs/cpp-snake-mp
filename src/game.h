@@ -27,7 +27,7 @@ private:
     std::uniform_int_distribution<int> random_h;
 
     void PlaceFood();
-    void SetupSocket();
+    void SetupSocket(const std::string& client_ip = "");
     void Update();
     static void *SocketHandler(void* game_ptr);
 

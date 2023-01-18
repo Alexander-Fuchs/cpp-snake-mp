@@ -75,11 +75,11 @@ void Snake::UpdateBody(SDL_Point &current_head_cell, SDL_Point &prev_head_cell) 
     }
 }
 
-bool Snake::HasEaten(SDL_Point &food) {
+bool Snake::HasEaten(SDL_Point &food, bool force) {
     int new_x = static_cast<int>(head_x);
     int new_y = static_cast<int>(head_y);
     // Check if there's food over here
-    if (food.x == new_x && food.y == new_y) {
+    if ((food.x == new_x && food.y == new_y) || force) {
         score++;
         // Grow snake and increase speed.
         GrowBody();
@@ -90,6 +90,10 @@ bool Snake::HasEaten(SDL_Point &food) {
 }
 
 void Snake::GrowBody() { growing = true; }
+
+void Snake::SetScore(int newScore) {
+    score = newScore;
+}
 
 int Snake::GetScore() const { return score; }
 

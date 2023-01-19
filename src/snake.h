@@ -12,7 +12,7 @@ public:
 
     Snake(int grid_width, int grid_height, bool is_client_player = false);
 
-    void Update();
+    void Update(int &socket);
     void GrowBody();
     void SetScore(int newScore);
 
@@ -35,7 +35,7 @@ public:
 private:
     void UpdateHead();
 
-    void UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
+    bool UpdateBody(SDL_Point &current_cell, SDL_Point &prev_cell);
 
     bool growing{false};
     int grid_width;

@@ -25,7 +25,6 @@ void Game::SetupSocket(const std::string& server_ip) {
     int opt = 1;
     struct sockaddr_in address;
     if (!server_ip.empty()) {
-        printf("Server IP not empty... using it\n");
         inet_pton(AF_INET, server_ip.c_str(), &address.sin_addr);
     }
     int addrlen = sizeof(address);
@@ -115,7 +114,11 @@ void *Game::SocketHandler(void *game_ptr)
             }
         }
         if (strBuffer.substr(0, 1) == "q") {
-            // TODO: Quit game
+            if (game->isHost) {
+                game->snake2.alive = false;
+            } else {
+                game->snake.alive = false;
+            }
         }
         memset(buffer, '\0', sizeof(buffer));
     }
@@ -201,8 +204,8 @@ void Game::PlaceFood(int forceX, int forceY) {
 }
 
 void Game::Update() {
-    snake.Update();
-    snake2.Update();
+    snake.Update(_socket);
+    snake2.Update(_socket);
     if (isHost) {
         bool snake1Eaten = snake.HasEaten(food);
         if (snake1Eaten) {

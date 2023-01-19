@@ -10,6 +10,7 @@
 class Game {
 public:
     Game(std::size_t grid_width, std::size_t grid_height);
+    ~Game();
 
     void Run(Controller const &controller, Renderer &renderer,
              std::size_t target_frame_duration, const std::string &client_ip);
@@ -32,7 +33,7 @@ private:
     static void *SocketHandler(void* game_ptr);
 
     bool isHost{false};
-    int _socket;
+    int server_fd, client_fd, _socket;
 };
 
 #endif

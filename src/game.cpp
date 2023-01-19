@@ -20,8 +20,18 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
     PlaceFood(30, 30);
 }
 
+Game::~Game() {
+    if (server_fd > 0) {
+        close(_socket);
+        shutdown(server_fd, SHUT_RDWR);
+    }
+    if (client_fd > 0) {
+        close(client_fd);
+    }
+}
+
 void Game::SetupSocket(const std::string& server_ip) {
-    int server_fd, client_fd, new_socket;
+    int new_socket;
     int opt = 1;
     struct sockaddr_in address;
     if (!server_ip.empty()) {

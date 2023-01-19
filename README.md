@@ -37,6 +37,18 @@ The build folder is only included for convenience (built for Apple Silicon). To 
 * **Competing snake's position out of sync:** This is because the game is not running on a server but on different machines. Each player only sends the input to the other player, and their machine is responsible for the game rendering. This is not a problem for the game itself but can confuse the player.
 
 
+## Rubrics covered
+* The project demonstrates an understanding of C++ functions and control structures.
+* The project accepts user input and processes the input. (command line arguments)
+* The project uses Object Oriented Programming techniques.
+* The project uses destructors appropriately.
+* Classes use appropriate access specifiers for class members.
+* Class constructors utilize member initialization lists.
+* Classes encapsulate behavior.
+* The project makes use of references in function declarations.
+* The project uses multithreading. (see `Game::SetupSocket`)
+
+
 ## CC Attribution-ShareAlike 4.0 International
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]

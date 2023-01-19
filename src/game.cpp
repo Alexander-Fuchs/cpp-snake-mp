@@ -53,7 +53,6 @@ void Game::SetupSocket(const std::string& server_ip) {
             perror("listen");
             exit(EXIT_FAILURE);
         }
-        printf("before accept\n");
         if ((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) > 0) {
             _socket = new_socket;
             pthread_t socket_handler;
@@ -76,13 +75,11 @@ void Game::SetupSocket(const std::string& server_ip) {
 
 void *Game::SocketHandler(void *game_ptr)
 {
-    printf("SocketHandler\n");
     Game * game = (Game*)game_ptr;
     int socket = game->_socket;
     char buffer[64] = { 0 };
     while (read(socket, buffer, 64)) {
         std::string strBuffer = buffer;
-        // printf("%s\n", buffer);
         if (strBuffer.substr(0, 1) == "s") {
             if (game->isHost) {
                 bool eaten = game->snake2.HasEaten(game->food, true);

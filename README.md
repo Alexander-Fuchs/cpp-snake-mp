@@ -1,12 +1,10 @@
-# CPPND: Capstone Snake Game Example
+# CPPND: Capstone Multiplayer Snake Game
 
-This is a starter repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). The code for this repo was inspired by [this](https://codereview.stackexchange.com/questions/212296/snake-game-in-c-with-sdl) excellent StackOverflow post and set of responses.
+This is the capstone project of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). 
+It is based on the [Snake Game](https://github.com/udacity/CppND-Capstone-Snake-Game) example code and has been extended to a multiplayer game via Sockets.
+Both snakes cannot intersect with each other and the goal is to eat as many food as possible.
 
-<img src="snake_game.gif"/>
-
-The Capstone Project gives you a chance to integrate what you've learned throughout this program. This project will become an important part of your portfolio to share with current and future colleagues and employers.
-
-In this project, you can build your own C++ application or extend this Snake game, following the principles you have learned throughout this Nanodegree Program. This project will demonstrate that you can independently create applications using a wide range of C++ features.
+<img src="snake_game_mp.gif"/>
 
 ## Dependencies for Running Locally
 * cmake >= 3.7
@@ -28,11 +26,15 @@ In this project, you can build your own C++ application or extend this Snake gam
 1. Clone this repo.
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
-4. Run it: `./SnakeGame`.
+4. Run it as host: `./SnakeGame`
+5. Run it as client: `./SnakeGame IP_ADDRESS_OF_HOST`
+
+
+## Known Caveats
+* **Competing snake's position out of sync:** This is because the game is not running on a server but on different machines. Each player only sends the input to the other player, and their machine is responsible for the game rendering. This is not a problem for the game itself but can confuse the player.
 
 
 ## CC Attribution-ShareAlike 4.0 International
-
 
 Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 

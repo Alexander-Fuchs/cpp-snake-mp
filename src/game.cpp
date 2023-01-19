@@ -130,6 +130,7 @@ void *Game::SocketHandler(void *game_ptr)
         }
         memset(buffer, '\0', sizeof(buffer));
     }
+    return nullptr;
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,

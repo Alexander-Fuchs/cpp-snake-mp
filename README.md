@@ -1,10 +1,13 @@
 # CPPND: Capstone Multiplayer Snake Game
 
+<img src="snake_game_mp.gif"/>
+
 This is the capstone project of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). 
 It is based on the [Snake Game](https://github.com/udacity/CppND-Capstone-Snake-Game) example code and has been extended to a multiplayer game via Sockets.
 Both snakes cannot intersect with each other and the goal is to eat as many food as possible.
 
-<img src="snake_game_mp.gif"/>
+The build folder is only included for convenience (built for Apple Silicon). To build the project, please use the commands as described.
+
 
 ## Dependencies for Running Locally
 * cmake >= 3.7
@@ -23,7 +26,7 @@ Both snakes cannot intersect with each other and the goal is to eat as many food
 
 ## Basic Build Instructions
 
-1. Clone this repo.
+1. Clone this repo
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it as host: `./SnakeGame`

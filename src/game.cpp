@@ -83,8 +83,6 @@ void *Game::SocketHandler(void *game_ptr)
             if (game->isHost) {
                 bool eaten = game->snake2.HasEaten(game->food, true);
                 game->PlaceFood();
-                std::string message = "f" + std::to_string(game->food.x) + "," + std::to_string(game->food.y);
-                send(socket, static_cast<void*>(&message), message.size(), 0);
             } else {
                 bool eaten = game->snake.HasEaten(game->food, true);
             }
@@ -197,9 +195,11 @@ void Game::PlaceFood(int forceX, int forceY) {
             if (!snake.SnakeCell(x, y) && !snake2.SnakeCell(x, y)) {
                 food.x = x;
                 food.y = y;
-                return;
+                break;
             }
         }
+        std::string message = "f" + std::to_string(food.x) + "," + std::to_string(food.y);
+        send(_socket, static_cast<void*>(&message), message.size(), 0);
     }
 }
 
@@ -211,8 +211,6 @@ void Game::Update() {
         if (snake1Eaten) {
             send(_socket, "s", 1, 0);
             PlaceFood();
-            std::string message = "f" + std::to_string(food.x) + "," + std::to_string(food.y);
-            send(_socket, static_cast<void*>(&message), message.size(), 0);
         }
     } else {
         bool snake2Eaten = snake2.HasEaten(food);
